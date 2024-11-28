@@ -9,6 +9,8 @@ const {errorHandler} = require("./services/globalErrorHandler")
 // Routes imports
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/UserRoutes");
+const flatRoutes = require("./routes/FlatRoutes");
+const messagesRoutes = require("./routes/MessagesRoutes")
 
 
 const PORT = process.env.PORT || 3030;
@@ -21,6 +23,8 @@ app.use(express.json());
 // Routes
 //unproctected routes
 app.use("/auth", authRoutes);
+app.use("/flats", flatRoutes);
+app.use("/messages", messagesRoutes);
 
 
 //protected routes

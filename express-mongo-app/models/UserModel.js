@@ -31,7 +31,7 @@ let UserSchema = new mongoose.Schema({
     },
     favoriteFlatList: {
         type:[mongoose.Schema.Types.ObjectId],
-        default:[]
+        ref:"Flats"
     },
     created:{
         type:Date,
