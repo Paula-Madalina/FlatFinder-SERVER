@@ -5,7 +5,7 @@ const express = require("express");
 const connectDB = require("./database/db");
 const authMiddleware = require("./middlewares/authMiddleware")
 const {errorHandler} = require("./services/globalErrorHandler")
-
+const cors = require('cors');
 // Routes imports
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/UserRoutes");
@@ -18,6 +18,7 @@ const ENVIROMENT = process.env.NODE_ENV || "DEV"
 
 const app = express();
 // Middleware
+app.use(cors());
 app.use(express.json());
 
 // Routes

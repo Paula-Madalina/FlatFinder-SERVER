@@ -32,8 +32,10 @@ const loginUser = async(req,res,next) => {
 
         if(!passwordValid) throw Error ("Passwords don't match")
         console.log(userEntry);
+        //generate token
         const token = signToken(userEntry);
-        res.status(200).json(token);
+        res.status(200).json({message: "Login successful", user: userEntry, token: token});
+
     }catch(error) {{
         next(error)
     }}

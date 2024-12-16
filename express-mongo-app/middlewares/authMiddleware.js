@@ -5,8 +5,11 @@ const verifyAuthentication = (req, res, next) => {
     try {
         const token = req.header('Authorization')?.replace('Bearer ', '');
         if (!token) throw Error("No token provided");
+        // console.log("Extracted token:", token); 
+
 
         const decoded = jwt.verify(token, process.env.SECRET_KEY);
+        console.log("Decoded token:", decoded); 
 
         const currentTime = Math.floor(Date.now() / 1000); // Current time in Unix format (seconds)
         if (decoded.exp < currentTime) {
@@ -14,6 +17,7 @@ const verifyAuthentication = (req, res, next) => {
         }
 
         req.user = decoded;
+
         next(); 
     } catch (error) {
         res.status(401).json({message: error.message});

@@ -29,7 +29,7 @@ const signToken = (user) => {
     const payload = {
         id:user._id,
         email:user.email,
-        fullName: user.firstName + " " + user.lastName,
+        fullName: user.fullName, 
         isAdmin:user.isAdmin
     }
     const secretKey = process.env.SECRET_KEY;
