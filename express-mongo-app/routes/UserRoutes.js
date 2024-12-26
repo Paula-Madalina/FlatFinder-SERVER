@@ -7,6 +7,7 @@ router.get("/",authMiddleware.verifyAdmin,UserController.getAllUsers);
 router.get("/:userId",UserController.getUserById);
 router.patch("/updateUser/:id", UserController.updateUser);
 router.delete("/deleteUser/:id", UserController.deleteUser);
+router.patch("/makeAdmin/:id", UserController.makeAdmin)
 
 
 

@@ -6,6 +6,8 @@ const connectDB = require("./database/db");
 const authMiddleware = require("./middlewares/authMiddleware")
 const {errorHandler} = require("./services/globalErrorHandler")
 const cors = require('cors');
+
+
 // Routes imports
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/UserRoutes");

@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const SALT_ROUNDS = 10;
 const jwt = require("jsonwebtoken")
 
+//password encryption
 const hashPassword = async (password) => {
     try{
         const salt = await bcrypt.genSalt(SALT_ROUNDS);
@@ -14,6 +15,8 @@ const hashPassword = async (password) => {
     }
 
 }
+
+//compare passwords
 const comparePasswords = async(inputPassword,hashedPassword) => {
     try {
         const isMatch = await bcrypt.compare(inputPassword,hashedPassword);

@@ -1,10 +1,9 @@
 let mongoose = require("mongoose");
 let Schema = mongoose.Schema;
-
 const MessageModel = new Schema({
-    content:{
-        type:String,
-        required:[true, "insert a content"]
+    content: {
+        type: String,
+        required: [true, "insert a content"]
     },
     flatID: {
         type: mongoose.Schema.Types.ObjectId,  
@@ -16,7 +15,13 @@ const MessageModel = new Schema({
         ref: "User", 
         required: true,
     },
-    created:Date
-},{versionKey:false})
+    receiverID: { // ID-ul utilizatorului care primește mesajul
+        type: mongoose.Schema.Types.ObjectId,  
+        ref: "User", 
+        required: true,
+    },
+    created: Date
+}, { versionKey: false });
+
 
 module.exports = mongoose.model("Messages", MessageModel);

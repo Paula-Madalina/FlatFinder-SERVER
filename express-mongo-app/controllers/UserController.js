@@ -1,6 +1,7 @@
 const UserModel = require("../models/UserModel");
 const responseUtils= require("../services/responseUtils")
-const encryption = require("../services/encryption-service")
+const encryption = require("../services/encryption-service");
+const FlatModel = require("../models/FlatModel");
 
 
 const getAllUsers = async(req,res) => {
@@ -70,26 +71,62 @@ const updateUser = async (req, res, next) => {
   };
   
 const deleteUser = async(req,res,next) => {
-    try {
-        const userID = req.params.id;
-        const user = await UserModel.findById(userID);
+        const userID = req.user.id;
+        const { id } = req.params; 
+
+        try {
+          const userToDelete = await UserModel.findById(id)
+        const loggedInUser = await UserModel.findById(userID);
+        console.log("mergeeeE??" + userToDelete);
+
         
-        if(!user) {
+        if(!userToDelete) {
            return  res.status(404).json({message:"USER NOT FOUND"});
         }
 
-        if(user._id.toString() !== req.user.id) {
-            return res.status(403).json({error:"you dont have permission to delete this user"})
+        if(!loggedInUser.isAdmin) {
+          if (userToDelete.id !== userID) {
+            return res.status(403).json({ message: "Nu aveți permisiunea să ștergeți acest cont!" });
+          }
         }
 
-        const deletedUser = await UserModel.findByIdAndDelete(userID);
+        if (loggedInUser.isAdmin) {
+          if (userToDelete.isAdmin && userToDelete.id !== userID) {
+              return res.status(403).json({ message: "Nu aveți permisiunea să ștergeți alți administratori!" });
+          }
+      }
+      const deletedFlats = await FlatModel.deleteMany({ownerID : id});
+      console.log(`Deleted ${deletedFlats.deletedCount} flats owned by the user.`)
 
-       return  res.status(200).json({message:"User deleted successfully", data: deletedUser})
+      // Șterge utilizatorul
+      await UserModel.findByIdAndDelete(id);
+      return res.status(200).json({ message: "Account deleted successfully!" });
+
 
     } catch(error) {
         console.log(error);
         res.status(500).json({error:error.message})
     }
+}
+
+const makeAdmin = async (req,res,next) => {
+  const { id } = req.params;
+  try {
+    const user = await UserModel.findByIdAndUpdate(
+      id,
+      { isAdmin : true },
+      { new: true }
+    )
+
+    if(!user) {
+      return res.status(404).json({message:"USER NOT FOUND"});
+    }
+
+    res.status(200).json({message: "User updated to admin", user});
+  } catch(error) {
+    console.log(error);
+    res.status(500).json({message: "Failed to update User", error:error.message})
+  }
 }
 
 
@@ -98,5 +135,6 @@ module.exports = {
     getAllUsers,
     getUserById,
     updateUser,
-    deleteUser
+    deleteUser,
+    makeAdmin,
 }

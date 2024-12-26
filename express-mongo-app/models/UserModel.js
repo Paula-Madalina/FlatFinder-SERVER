@@ -25,10 +25,18 @@ let UserSchema = new mongoose.Schema({
         type:Boolean,
         default: false
     },
-    favoriteFlatList: {
-        type:[mongoose.Schema.Types.ObjectId],
-        ref:"Flats"
-    },
+    flatList: [  
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Flats"
+        }
+    ],
+    favoriteFlatList: [ 
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Flats"
+        }
+    ],
     created:{
         type:Date,
         default: Date.now
