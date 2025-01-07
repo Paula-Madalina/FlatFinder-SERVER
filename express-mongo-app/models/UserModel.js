@@ -44,7 +44,9 @@ let UserSchema = new mongoose.Schema({
     updated:{
         type:Date,
         default: Date.now
-    }
+    },
+    passwordChangeToken:String,
+
 },
 {
     versionKey:false

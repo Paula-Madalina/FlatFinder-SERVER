@@ -8,7 +8,7 @@ const connectDB = async () => {
     // const MONGO_URI = `mongodb+srv://paulaprepelita:FullstackDeveloper14()@flatfinder-cluster.52prx.mongodb.net/FlatFinder?retryWrites=true&w=majority&appName=FlatFinder-Cluster`
 
     try {
-        console.log("MONGO_URI", MONGO_URI)
+        console.log("MONGO_URI:", MONGO_URI)
         await mongoose.connect(MONGO_URI);
         console.log("success");
 

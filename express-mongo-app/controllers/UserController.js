@@ -2,6 +2,11 @@ const UserModel = require("../models/UserModel");
 const responseUtils= require("../services/responseUtils")
 const encryption = require("../services/encryption-service");
 const FlatModel = require("../models/FlatModel");
+const MessageModel = require("../models/MessageModel");
+let utils = require("../services/utils")
+const authMiddleware = require("../middlewares/authMiddleware");
+const jwt = require("jsonwebtoken")
+
 
 
 const getAllUsers = async(req,res) => {
@@ -77,24 +82,30 @@ const deleteUser = async(req,res,next) => {
         try {
           const userToDelete = await UserModel.findById(id)
         const loggedInUser = await UserModel.findById(userID);
-        console.log("mergeeeE??" + userToDelete);
-
         
         if(!userToDelete) {
            return  res.status(404).json({message:"USER NOT FOUND"});
         }
 
-        if(!loggedInUser.isAdmin) {
+        if (!loggedInUser.isAdmin) {
           if (userToDelete.id !== userID) {
-            return res.status(403).json({ message: "Nu aveți permisiunea să ștergeți acest cont!" });
-          }
-        }
-
-        if (loggedInUser.isAdmin) {
-          if (userToDelete.isAdmin && userToDelete.id !== userID) {
-              return res.status(403).json({ message: "Nu aveți permisiunea să ștergeți alți administratori!" });
+              return res.status(403).json({ message: "You do not have permission to delete this account!" });
           }
       }
+
+      if (loggedInUser.isAdmin) {
+        if (userToDelete.isAdmin && userToDelete.id !== userID) {
+            return res.status(403).json({ message: "You do not have permission to delete other admins!" });
+        }
+    }
+
+      await MessageModel.deleteMany({
+        $or: [
+          {senderID: id},
+          {receiverID:id}
+        ]
+      })
+
       const deletedFlats = await FlatModel.deleteMany({ownerID : id});
       console.log(`Deleted ${deletedFlats.deletedCount} flats owned by the user.`)
 
@@ -130,11 +141,61 @@ const makeAdmin = async (req,res,next) => {
 }
 
 
+const forgotPassword = async function(req,res,next) {
+  // try {
+    // console.log("Received request for forgot password");
+      let user = await UserModel.findOne({ email: req.body.email });
+      if (!user) {
+          res.json({ error: "please specify email!" });
+          return;
+      }
+      let resetToken = encryption.signToken(user._id);
+      user.passwordChangeToken = resetToken;
+      await user.save();
+      let url = `${req.protocol}://${req.get('host')}/resetPassword/${resetToken}`;
+      let message = "click on the link to reset password";
+
+      await utils.sendEmail({
+          from: "myapplication@noreply.com",
+          email: user.email,
+          subject: "Reset password",
+          text: `${message} \r\n ${url}`
+      });
+      res.json({ message: "A link to reset your password has been sent.", token: resetToken });
+      // }
+  // } catch (error) {
+  //     let user = await UserModel.findOne({ email: req.body.email });
+  //     user.passwordChangeToken = undefined;
+  //     await user.save();
+  //     res.json({ error: "email could not be sent!" });
+  // }
+}
+
+const resetPassword = async function(req,res,next) {
+  console.log("asdfgh",req.params.token); // Verifică ce parametri sunt preluați
+  let token = req.params.token;
+  console.log("token" , token); 
+  
+      let user = await UserModel.findOne({passwordChangeToken:token});
+      if(!user) {
+          res.json({error:"User doesn t exist or has not requested password change"});
+          return;
+      }
+      user.password = req.body.password;
+      user.passwordChangeToken = undefined;
+      await user.save();
+      const newToken = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: '1h' });
+      res.json({status:newToken})
+  // }
+}
+
 
 module.exports = {
-    getAllUsers,
-    getUserById,
-    updateUser,
-    deleteUser,
-    makeAdmin,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+  makeAdmin,
+  forgotPassword,
+  resetPassword
 }

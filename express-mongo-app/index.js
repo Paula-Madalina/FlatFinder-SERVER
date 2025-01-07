@@ -31,7 +31,7 @@ app.use("/messages", messagesRoutes);
 
 
 //protected routes
-app.use("/users", authMiddleware.verifyAuthentication,userRoutes);
+app.use("/users",userRoutes);
 // app.use("/users", userRoutes);
 
 //Global error handler
