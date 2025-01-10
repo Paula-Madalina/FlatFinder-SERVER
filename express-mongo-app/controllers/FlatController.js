@@ -33,8 +33,8 @@ exports.flatRegister = async function (req, res, next) {
 
 exports.getMyFlats = async function (req, res, next) {
     try {
-        const userIDFromToken = req.user.id; // ID-ul utilizatorului din token
-        console.log("userID from token:", userIDFromToken);   // Verifică în backend dacă token-ul este valid
+        const userIDFromToken = req.user.id; 
+        console.log("userID from token:", userIDFromToken);   
 
         const myFlats = await FlatModel.find({ ownerID: userIDFromToken.toString() });
         console.log(myFlats)
@@ -65,7 +65,7 @@ exports.getFlatByID = async function(req, res, next) {
   
       res.status(200).json(flatData);
     } catch (error) {
-      console.error("Error in getFlatByID:", error.message); // Log detaliat
+      console.error("Error in getFlatByID:", error.message); 
       res.status(500).json({ message: error.message });
     }
   };
@@ -195,7 +195,7 @@ exports.getFavoriteFlats = async (req, res) => {
       const userId = req.user.id; 
       console.log(`Current user ID: ${userId}`);
   
-      const flatId = req.params.flatId;  // ID-ul apartamentului care trebuie eliminat
+      const flatId = req.params.flatId;  
       console.log(`Flat ID to remove: ${flatId}`);
   
       const user = await UserModel.findById(userId);
@@ -206,7 +206,7 @@ exports.getFavoriteFlats = async (req, res) => {
   
       console.log("Favorites before update:", user.favoriteFlatList);
   
-      user.favoriteFlatList = user.favoriteFlatList.filter((id) => id.toString() !== flatId);  // Folosește toString pentru comparație
+      user.favoriteFlatList = user.favoriteFlatList.filter((id) => id.toString() !== flatId);  
       await user.save();
   
       console.log("Favorites after update:", user.favoriteFlatList);

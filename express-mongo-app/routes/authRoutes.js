@@ -10,7 +10,7 @@ router.post('/login', AuthController.loginUser)
 router.get("/verify", authMiddleware.verifyAuthentication, async (req, res) => {
   console.log(req.user)
   try {
-    const user = await UserModel.findById(req.user.id).select("-password"); // Exclude parola
+    const user = await UserModel.findById(req.user.id).select("-password"); 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
