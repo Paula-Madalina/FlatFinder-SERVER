@@ -5,16 +5,15 @@ let UserModel = require("../models/UserModel");
 
 exports.addMessage = async function(req, res, next) {
     try {
-        let messageDetails = req.body; // Detaliile mesajului din cerere
+        let messageDetails = req.body; 
         messageDetails.created = new Date();
-        messageDetails.flatID = req.params.id; // ID-ul flat-ului din parametru
-        messageDetails.senderID = req.user.id; // ID-ul utilizatorului logat (expeditor)
+        messageDetails.flatID = req.params.id; 
+        messageDetails.senderID = req.user.id; 
 
         if (!messageDetails.receiverID) {
             return res.status(400).json({ error: "Receiver ID is required." });
         }
 
-        // Crează un nou mesaj
         let newMessage = new MessageModel(messageDetails);
         let savedMessage = await newMessage.save();
 
@@ -30,14 +29,12 @@ exports.addMessage = async function(req, res, next) {
 exports.getUserMessages = async function(req, res, next) {
     try {
         let flatID = req.params.id;
-        // Extrage ID-ul utilizatorului autentic din token
         let senderID = req.user.id;
 
         if (!senderID) {
             return res.status(403).json({ message: "User not authenticated" });
         }
 
-        // Căutăm mesajele trimise de utilizatorul autentic pentru apartamentul specificat
         const allMessages = await MessageModel.find({
             flatID: flatID,
             senderID: senderID
@@ -73,20 +70,18 @@ exports.getAllMessages = async function(req, res, next) {
 
 exports.getMessagesByUser = async (req, res) => {
     try {
-        const loggedUserId = req.user.id; // ID-ul utilizatorului logat
+        const loggedUserId = req.user.id; 
         console.log(loggedUserId);
-        // Găsește mesajele unde utilizatorul logat este destinatar
         const messages = await MessageModel.find({
             receiverID: loggedUserId,
         })
-        .populate('senderID', 'fullName email') // Populează expeditorul (nume și email)
-        .populate('flatID', 'name address'); // Populează informațiile despre flat (nume și adresă)
+        .populate('senderID', 'fullName email') 
+        .populate('flatID', 'name address');
 
         if (!messages.length) {
             return res.status(404).json({ message: "No messages received by this user." });
         }
 
-        // Trimite mesajele către client
         res.status(200).json({
             message: "Messages retrieved successfully.",
             data: messages,
@@ -100,26 +95,24 @@ exports.getMessagesByUser = async (req, res) => {
 
 exports.sendReply = async function(req, res, next) {
     try {
-        const { receiverID, content, flatID } = req.body; // Adaugă flatID aici
-        const currentUserID = req.user.id; // ID-ul utilizatorului autentificat (expeditorul răspunsului)
+        const { receiverID, content, flatID } = req.body; 
+        const currentUserID = req.user.id; 
 
-        if (!receiverID || !content || !flatID) { // Verifică dacă flatID este inclus
+        if (!receiverID || !content || !flatID) { 
             return res.status(400).json({ error: "Receiver ID, content, and flatID are required." });
         }
 
-        // Crează un nou mesaj de răspuns
         const replyMessage = new MessageModel({
-            content: content, // Conținutul mesajului
-            senderID: currentUserID, // Expeditorul este utilizatorul care răspunde
-            receiverID: receiverID, // Destinatarul este persoana care a trimis mesajul inițial
-            flatID: flatID, // Adaugă flatID în mesaj
+            content: content,
+            senderID: currentUserID, 
+            receiverID: receiverID, 
+            flatID: flatID, 
             created: new Date(),
-            replyTo: receiverID, // Poți adăuga un câmp 'replyTo' pentru a lega acest mesaj de mesajul inițial
+            replyTo: receiverID,
         });
 
         console.log(replyMessage);
 
-        // Salvează mesajul de răspuns în baza de date
         const savedReply = await replyMessage.save();
 
         console.log("Reply sent successfully.");

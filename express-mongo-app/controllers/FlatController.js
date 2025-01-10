@@ -36,7 +36,6 @@ exports.getMyFlats = async function (req, res, next) {
         const userIDFromToken = req.user.id; // ID-ul utilizatorului din token
         console.log("userID from token:", userIDFromToken);   // Verifică în backend dacă token-ul este valid
 
-        // Caută apartamentele utilizatorului (unde ownerID este userID din token)
         const myFlats = await FlatModel.find({ ownerID: userIDFromToken.toString() });
         console.log(myFlats)
 
@@ -56,8 +55,8 @@ exports.getMyFlats = async function (req, res, next) {
 
 exports.getFlatByID = async function(req, res, next) {
     try {
-      const flatID = req.params.flatId; // Este parametrul ID definit corect?
-      console.log("Flat ID received in backend:", flatID); // Adaugă acest log
+      const flatID = req.params.flatId; 
+      console.log("Flat ID received in backend:", flatID); 
   
       const flatData = await FlatModel.findById(flatID);
       if (!flatData) {
@@ -91,7 +90,6 @@ exports.updateFlat = async function (req, res, next) {
         const flatID = req.params.id;
         const updatedFlat = req.body;
 
-        // Actualizează și returnează datele noi
         const flat = await FlatModel.findById(flatID);
 
         if (!flat) {
@@ -140,26 +138,6 @@ exports.deleteFlat = async function (req, res, next) {
     }
 };
 
-
-// exports.getFavoriteFlats = async (req, res) => {
-//     try {
-//         const userId = req.user.id; // ID-ul utilizatorului autenticat, obținut prin middleware-ul de autentificare
-//         const user = await UserModel.findById(userId).populate('favoriteFlatList'); // Se folosește populate pentru a aduce apartamentele favorite
-
-//         if (!user) {
-//             return res.status(404).json({ error: 'User not found' });
-//         }
-
-//         res.status(200).json({
-//             message: 'Favorite flats fetched successfully',
-//             data: user.favoriteFlatList, // Aceasta va returna lista de apartamente favorite
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ error: error.message });
-//     }
-// };
-
 exports.toggleFavoriteFlat = async (req, res) => {
     try {
       const userId = req.user.id;
@@ -174,12 +152,10 @@ exports.toggleFavoriteFlat = async (req, res) => {
       const isFavorite = user.favoriteFlatList.includes(flatId);
   
       if (isFavorite) {
-        // Elimină apartamentul din favorite
         user.favoriteFlatList = user.favoriteFlatList.filter(
           (id) => id.toString() !== flatId
         );
       } else {
-        // Adaugă apartamentul în favorite
         user.favoriteFlatList.push(flatId);
       }
   
@@ -197,7 +173,7 @@ exports.toggleFavoriteFlat = async (req, res) => {
 
 exports.getFavoriteFlats = async (req, res) => {
     try {
-        const userId = req.params.userId;  // Folosește userId din URL, nu din token
+        const userId = req.params.userId;  
         const user = await UserModel.findById(userId).populate('favoriteFlatList'); 
   
       if (!user) {
@@ -222,24 +198,19 @@ exports.getFavoriteFlats = async (req, res) => {
       const flatId = req.params.flatId;  // ID-ul apartamentului care trebuie eliminat
       console.log(`Flat ID to remove: ${flatId}`);
   
-      // Găsește utilizatorul în baza de date
       const user = await UserModel.findById(userId);
       if (!user) {
         console.log("User not found in the database");
         return res.status(404).json({ message: 'User not found' });
       }
   
-      // Verifică lista de favorite înainte de actualizare
       console.log("Favorites before update:", user.favoriteFlatList);
   
-      // Elimină flat-ul din favoriteFlatList
       user.favoriteFlatList = user.favoriteFlatList.filter((id) => id.toString() !== flatId);  // Folosește toString pentru comparație
       await user.save();
   
-      // Verifică lista de favorite după actualizare
       console.log("Favorites after update:", user.favoriteFlatList);
   
-      // Răspunde cu lista actualizată de favorite
       res.status(200).json({ message: 'Flat removed from favorites', data: user.favoriteFlatList });
     } catch (error) {
       console.log("Error in removeFromFavorites:", error);
@@ -256,7 +227,6 @@ exports.flatByUserId = async (req, res) => {
       const userId = req.params.userId;
       console.log("merge?? " + userId);
       
-      // Obține utilizatorul cu doar `favoriteFlatList`
       const user = await UserModel.findById(userId, "flatList");
   
       if (!user) {
@@ -276,13 +246,11 @@ exports.flatByUserId = async (req, res) => {
     }
   };
 
-  // Ruta pentru a număra apartamentele unui utilizator
   exports.flatsCount = async(req,res,next) => {
     try {
         const userId = req.params.userId;
-        console.log('userId:', userId); // Verifică valoarea ID-ului
+        console.log('userId:', userId); 
 
-        // Numără apartamentele pentru utilizatorul respectiv
         const flatsCount = await FlatModel.countDocuments({ ownerID: userId });
 
         res.json({ count: flatsCount });

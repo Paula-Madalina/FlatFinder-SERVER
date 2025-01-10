@@ -53,21 +53,18 @@ const updateUser = async (req, res, next) => {
         return res.status(403).json({ error: "You have no permission to update this user" });
       }
   
-      // Dacă parola a fost inclusă în cererea de actualizare, o criptăm
       if (updatedUser.password) {
         updatedUser.password = await encryption.hashPassword(updatedUser.password);
       }
   
-      // Actualizează utilizatorul manual și salvează-l
-      user.set(updatedUser); // Setează noile valori
-      const updatedUserData = await user.save(); // Salvează documentul cu noile date (inclusiv parola criptată dacă a fost modificată)
+      user.set(updatedUser); 
+      const updatedUserData = await user.save(); 
   
       console.log(updatedUserData);
   
-      // Trimite utilizatorul actualizat în răspuns
       res.status(200).json({
         message: "Updated Successfully",
-        user: updatedUserData, // Trimite datele utilizatorului actualizate
+        user: updatedUserData, 
       });
     } catch (error) {
       console.log(error);
@@ -109,7 +106,6 @@ const deleteUser = async(req,res,next) => {
       const deletedFlats = await FlatModel.deleteMany({ownerID : id});
       console.log(`Deleted ${deletedFlats.deletedCount} flats owned by the user.`)
 
-      // Șterge utilizatorul
       await UserModel.findByIdAndDelete(id);
       return res.status(200).json({ message: "Account deleted successfully!" });
 
@@ -142,8 +138,7 @@ const makeAdmin = async (req,res,next) => {
 
 
 const forgotPassword = async function(req,res,next) {
-  // try {
-    // console.log("Received request for forgot password");
+ 
       let user = await UserModel.findOne({ email: req.body.email });
       if (!user) {
           res.json({ error: "please specify email!" });
@@ -162,17 +157,11 @@ const forgotPassword = async function(req,res,next) {
           text: `${message} \r\n ${url}`
       });
       res.json({ message: "A link to reset your password has been sent.", token: resetToken });
-      // }
-  // } catch (error) {
-  //     let user = await UserModel.findOne({ email: req.body.email });
-  //     user.passwordChangeToken = undefined;
-  //     await user.save();
-  //     res.json({ error: "email could not be sent!" });
-  // }
+    
 }
 
 const resetPassword = async function(req,res,next) {
-  console.log("asdfgh",req.params.token); // Verifică ce parametri sunt preluați
+  console.log("asdfgh",req.params.token); 
   let token = req.params.token;
   console.log("token" , token); 
   

@@ -28,6 +28,7 @@ const comparePasswords = async(inputPassword,hashedPassword) => {
     }
 }
 
+//token generation
 const signToken = (user) => {
     const payload = {
         id:user._id,

@@ -1,5 +1,4 @@
 let mongoose = require("mongoose");
-// let bcrypt = require("bcrypt");
 let { hashPassword } = require("../services/encryption-service")
 
 let UserSchema = new mongoose.Schema({

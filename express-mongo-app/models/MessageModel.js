@@ -15,7 +15,7 @@ const MessageModel = new Schema({
         ref: "User", 
         required: true,
     },
-    receiverID: { // ID-ul utilizatorului care primește mesajul
+    receiverID: { 
         type: mongoose.Schema.Types.ObjectId,  
         ref: "User", 
         required: true,
